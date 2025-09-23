@@ -6,18 +6,203 @@ Este projeto apresenta uma aplicação **WordPress** com **alta disponibilidade*
 
 ## Tecnologias utilizadas
 
-- **WordPress**: Sistema de gerenciamento de conteúdo (CMS)
-- **Docker & Docker Compose**: Containerização da aplicação e gerenciamento dos serviços
-- **Amazon EC2**: Hospedagem dos containers WordPress em múltiplas zonas de disponibilidade
-- **Amazon RDS**: Banco de dados relacional MySQL gerenciado
-- **Amazon EFS**: Sistema de arquivos compartilhado para uploads e conteúdo persistente
-- **Elastic Load Balancer (ELB)**: Distribuição de tráfego entre múltiplas instâncias EC2
-- **Auto Scaling**: Ajuste automático da quantidade de instâncias EC2 conforme a demanda
-- **Bastion Host**: Acesso seguro às instâncias privadas
+* **WordPress**: Sistema de gerenciamento de conteúdo (CMS)
+* **Docker \& Docker Compose**: Containerização da aplicação e gerenciamento dos serviços
+* **Amazon EC2**: Hospedagem dos containers WordPress em múltiplas zonas de disponibilidade
+* **Amazon RDS**: Banco de dados relacional MySQL gerenciado
+* **Amazon EFS**: Sistema de arquivos compartilhado para uploads e conteúdo persistente
+* **Elastic Load Balancer (ELB)**: Distribuição de tráfego entre múltiplas instâncias EC2
+* **Auto Scaling**: Ajuste automático da quantidade de instâncias EC2 conforme a demanda
+* **Bastion Host**: Acesso seguro às instâncias privadas
 
 ## Pré-requisitos
 
 Antes de iniciar a implantação da aplicação, é necessário:
 
-- **Conta ativa na AWS** com permissões para criar EC2, RDS, EFS, ELB e Auto Scaling
-- Conhecimento básico em **Linux**, **Docker/Docker Compose** e **bancos de dados relacionais (MySQL)** para um bom entendimento do processo mostrado neste documento
+* **Conta ativa na AWS** com permissões para criar EC2, RDS, EFS, ELB e Auto Scaling
+* Conhecimento básico em **Linux**, **Docker/Docker Compose** e **bancos de dados relacionais (MySQL)** para um bom entendimento do processo mostrado neste documento
+
+
+
+Primeiros passos: (Estrutura de rede)
+
+
+
+Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para isso na tela inicial da sua conta AWS e entre no menu da VPC escrevendo VPC na barra de pesquisa:
+
+
+
+\[IMAGEM - 1]
+
+
+
+Após isso selecione criar VPC, coloque um nome de sua preferência, preencha sua CIDR e Tags caso queira. A VPC utilizada neste projeto se chama vpcPrincipal. Agora com VPC criada somos capazes de criar nossas sub-redes, serão 4 sub-redes, 2 públicas e 2 privadas. Iremos trabalhar com zonas de disponibilidades diferentes então será uma pública e uma privada para zona us-east-1a e uma pública e uma privada para a zona us-east-1b, mas altere de acordo com sua necessidade.
+
+
+
+\[IMAGEM - 2]
+
+
+
+Repare que após a criação das sub-redes ainda não temos como saber qual de fato é uma sub-rede pública, pois nenhuma tem acesso a internet ainda. Para isso devemos criar um Gateway de internet, para isso no painel da VPC acesse "Gateways da Internet", crie seu gateway e associe a sua VPC.
+
+
+
+\[IMAGEM - 3]
+
+
+
+Agora que temos um Gateway para Internet podemos criar as rotas necessárias para que as sub-redes públicas tenham acesso a internet. Para isso clique em "Tabelas de rotas" e crie 3 rotas, uma rota será nossa saída para a internet, e as outras duas serão as rotas das sub-redes privadas (falaremos posteriormente sobre as rotas privadas). Com as 3 rotas criadas selecione a rota pública, e na aba "Rotas" selecione "Editar rotas".
+
+
+
+\[IMAGEM - 4] 
+
+
+
+Selecione "Adicionar rota" e escolha a opção de Gateway de internet, selecione o Gateway criado e salve as alterações. Após esse procedimento temos uma rota apontando para a saída de internet.
+
+
+
+\[IMAGEM - 5]
+
+
+
+Volte ao menu de sub-redes, e selecione cada rede e verifique se as duas sub-redes públicas estão associadas a tabela de rotas com saída para internet que acabamos de criar. Se necessário edite a associação da tabela de rotas.
+
+
+
+\[IMAGEM 6]
+
+
+
+Após configurar as sub-redes públicas é necessário configurar as sub-redes privadas, para isso é necessário criar dois Gateways NAT conectados as sub-redes públicas. Isso é necessário para que nossas instâncias EC2 privadas possam ter acesso a internet e ao mesmo tempo não serem acessíveis da internet. Para criar os Gateways NAT vá em "Gateway NAT" e crie dois gateways, o primeiro associado a sub-rede pública da zona us-east-1a, e outro associado a sub-rede públic us-east-1b. Repare que é necessário também criar IPs elásticos para cada Gateway. 
+
+
+
+\[IMAGEM 7]
+
+
+
+Com os Gateways NAT criados devemos voltar para a tabela de rotas, e agora nas rotas privadas criadas anteriormente, devemos editar a primeira para que ela se conecte ao Gateway NAT associado a sub-rede pública da zona us-east-1a, e editar a segunda rota privada para se conectar ao Gateway NAT associado a sub-rede pública da zona us-east-1b.
+
+
+
+\[IMAGEM 8]
+
+
+
+Agora a estrutura de rede está completa e pronta para ser utilizada pelas nossas instâncias.
+
+
+
+\## Security Groups
+
+
+
+Antes de prosseguir com os outros recursos vamos deixar os Security Groups necessários prontos para serem usados, devemos criar 4 Security Groups, um para o RDS, outro para as instâncias EC2 do Wordpress, um para o Bastion Host, e um para o Load Balancer.
+
+
+
+\[IMAGEM 9]
+
+
+
+Após a criação vamos configurar cada um dos Security Groups ajustando as regras de entrada, começando pelo Security Group do Bastion Host você deve permitir acesso via SSH (Para criar sua chave SSH no painel EC2 em Rede e segurança clique em Pares de chaves e crie sua chave, caso não queira também é possível criar uma chave durante a criação da instância do Bastion Host).
+
+
+
+\[IMAGEM 10]
+
+
+
+Para o Security Group das instâncias do Wordpress configure as regras de entrada permitindo qualquer requisição HTTP, e a entrada via SSH do Security Group do Bastion Host.
+
+
+
+\[IMAGEM 11]
+
+
+
+Para o Security Group do RDS devemos permitir a entrada do tipo MySQL/Aurora para o Security Group das instâncias do Wordpress.
+
+
+
+\[IMAGEM 12]
+
+
+
+E por último para o Load Balancer devemos permitir qualquer requisição HTTP de qualquer endereço IP.
+
+
+
+\[IMAGEM 13]
+
+
+
+\## RDS
+
+
+
+Vamos iniciar a criação do RDS, para isso pesquise RDS na barra de pesquisa e selecione "Aurora e RDS", selecione "Criar um banco de dados". Para este projeto selecione o banco de dados MySQL.
+
+
+
+\[IMAGEM 14]
+
+
+
+Escolha o modelo para seu caso de uso, para o projeto seguiremos com o nível gratuito.
+
+
+
+\[IMAGEM 15]
+
+
+
+Em Configurações preencha o nome do seu banco de dados, o usuário e a senha
+
+
+
+\[IMAGEM 16]
+
+
+
+Em Conectividade selecione a VPC criada anteriormente e também o Security Group do banco de dados. Desça até o final da página e clique em "Criar banco de dados".
+
+
+
+\[IMAGEM 17]
+
+
+
+\## EFS
+
+
+
+Para criar o EFS digite EFS na barra de pesquisa e clique em "Criar sistema de arquivos" e depois em "Personalizar"
+
+
+
+\[IMAGEM 18]
+
+
+
+Se preferir digite um nome para seu EFS e no final da página clique em "Próximo", na configuração de rede, selecione as sub-redes privadas e o grupo de segurança das instâncias do Wordpress, clique em "Próximo" até o final e crie o seu EFS
+
+
+
+\[IMAGEM 19]
+
+
+
+
+
+
+
+\[IMAGEM 20]
+
+
+
+
+
