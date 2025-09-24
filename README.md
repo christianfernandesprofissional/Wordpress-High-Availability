@@ -57,14 +57,10 @@ Repare que após a criação das sub-redes ainda não temos como saber qual de f
 Agora que temos um Gateway para Internet podemos criar as rotas necessárias para que as sub-redes públicas tenham acesso a internet. Para isso clique em "Tabelas de rotas" e crie 3 rotas, uma rota será nossa saída para a internet, e as outras duas serão as rotas das sub-redes privadas. Com as 3 rotas criadas selecione a rota pública, e na aba "Rotas" selecione "Editar rotas".
 
 
-
-
 ![tabelas-de-rotas](/imagens/tabelas-de-rotas.png "Tabelas de rotas")
 
 
-
 Selecione "Adicionar rota" e escolha a opção de Gateway de internet, selecione o Gateway criado e salve as alterações. Após esse procedimento temos uma rota apontando para a saída de internet.
-
 
 
 ![editar-rotas-gateway-internet](/imagens/editar-rotas-gateway-internet.png "Editar rota pública")
@@ -82,7 +78,7 @@ Após configurar as sub-redes públicas é necessário configurar as sub-redes p
 
 
 
-\[IMAGEM 7]
+![gateway-nat](/imagens/gateway-nat.png "Criar gateway NAT")
 
 
 
@@ -90,7 +86,7 @@ Com os Gateways NAT criados devemos voltar para a tabela de rotas, e agora nas r
 
 
 
-\[IMAGEM 8]
+![editar-rotas-gateway-nat](/imagens/editar-rotas-gateway-nat.png "Associar sub-rede ao gateway NAT")
 
 
 
@@ -98,7 +94,7 @@ Agora a estrutura de rede está completa e pronta para ser utilizada pelas nossa
 
 
 
-\## Security Groups
+## Security Groups
 
 
 
@@ -142,7 +138,7 @@ E por último para o Load Balancer devemos permitir qualquer requisição HTTP d
 
 
 
-\## RDS
+## RDS
 
 
 
@@ -178,7 +174,7 @@ Em Conectividade selecione a VPC criada anteriormente e também o Security Group
 
 
 
-\## EFS
+## EFS
 
 
 
@@ -198,7 +194,7 @@ Se preferir digite um nome para seu EFS e no final da página clique em "Próxim
 
 
 
-\## Load Balancer
+\# Load Balancer
 
 
 
@@ -254,5 +250,5 @@ Com o nosso banco de dados RDS e nosso sistema de arquivos EFS prontos, podemos 
 
 
 
-\## User-data
+## User-data
 
