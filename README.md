@@ -28,7 +28,7 @@ Primeiros passos: (Estrutura de rede)
 
 
 
-Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para isso na tela inicial da sua conta AWS e entre no menu da VPC escrevendo VPC na barra de pesquisa:
+Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para isso na tela inicial da sua conta AWS e entre no menu da VPC escrevendo VPC na barra de pesquisa. Então selecione criar VPC, coloque um nome de sua preferência, preencha sua CIDR e Tags caso queira. A VPC utilizada neste projeto se chama vpcPrincipal. 
 
 
 
@@ -36,7 +36,7 @@ Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para 
 
 
 
-Após isso selecione criar VPC, coloque um nome de sua preferência, preencha sua CIDR e Tags caso queira. A VPC utilizada neste projeto se chama vpcPrincipal. Agora com VPC criada somos capazes de criar nossas sub-redes, serão 4 sub-redes, 2 públicas e 2 privadas. Iremos trabalhar com zonas de disponibilidades diferentes então será uma pública e uma privada para zona us-east-1a e uma pública e uma privada para a zona us-east-1b, mas altere de acordo com sua necessidade.
+Agora com VPC criada somos capazes de criar nossas sub-redes, no painel da VPC selecione "Sub-redes" e depois "Criar sub-rede", serão 4 sub-redes, 2 públicas e 2 privadas. Iremos trabalhar com zonas de disponibilidades diferentes então será uma pública e uma privada para zona us-east-1a e uma pública e uma privada para a zona us-east-1b, mas altere de acordo com sua necessidade.
 
 
 
@@ -52,11 +52,11 @@ Repare que após a criação das sub-redes ainda não temos como saber qual de f
 
 
 
-Agora que temos um Gateway para Internet podemos criar as rotas necessárias para que as sub-redes públicas tenham acesso a internet. Para isso clique em "Tabelas de rotas" e crie 3 rotas, uma rota será nossa saída para a internet, e as outras duas serão as rotas das sub-redes privadas (falaremos posteriormente sobre as rotas privadas). Com as 3 rotas criadas selecione a rota pública, e na aba "Rotas" selecione "Editar rotas".
+Agora que temos um Gateway para Internet podemos criar as rotas necessárias para que as sub-redes públicas tenham acesso a internet. Para isso clique em "Tabelas de rotas" e crie 3 rotas, uma rota será nossa saída para a internet, e as outras duas serão as rotas das sub-redes privadas. Com as 3 rotas criadas selecione a rota pública, e na aba "Rotas" selecione "Editar rotas".
 
 
 
-\[IMAGEM - 4] 
+\[IMAGEM - 4]
 
 
 
@@ -76,7 +76,7 @@ Volte ao menu de sub-redes, e selecione cada rede e verifique se as duas sub-red
 
 
 
-Após configurar as sub-redes públicas é necessário configurar as sub-redes privadas, para isso é necessário criar dois Gateways NAT conectados as sub-redes públicas. Isso é necessário para que nossas instâncias EC2 privadas possam ter acesso a internet e ao mesmo tempo não serem acessíveis da internet. Para criar os Gateways NAT vá em "Gateway NAT" e crie dois gateways, o primeiro associado a sub-rede pública da zona us-east-1a, e outro associado a sub-rede públic us-east-1b. Repare que é necessário também criar IPs elásticos para cada Gateway. 
+Após configurar as sub-redes públicas é necessário configurar as sub-redes privadas, para isso é necessário criar dois Gateways NAT conectados as sub-redes públicas. Isso é necessário para que nossas instâncias EC2 privadas possam ter acesso a internet e ao mesmo tempo não serem acessíveis da internet. Para criar os Gateways NAT vá em "Gateway NAT" e crie dois gateways, o primeiro associado a sub-rede pública da zona us-east-1a, e outro associado a sub-rede públic us-east-1b. Repare que é necessário também criar IPs elásticos para cada Gateway.
 
 
 
@@ -100,7 +100,7 @@ Agora a estrutura de rede está completa e pronta para ser utilizada pelas nossa
 
 
 
-Antes de prosseguir com os outros recursos vamos deixar os Security Groups necessários prontos para serem usados, devemos criar 4 Security Groups, um para o RDS, outro para as instâncias EC2 do Wordpress, um para o Bastion Host, e um para o Load Balancer.
+Antes de prosseguir com os outros recursos vamos deixar os Security Groups necessários prontos para serem usados, para isso vá até o painel da EC2 e selecione "Security groups". Devemos criar 4 Security Groups, um para o RDS, outro para as instâncias EC2 do Wordpress, um para o Bastion Host, e um para o Load Balancer.
 
 
 
@@ -196,6 +196,54 @@ Se preferir digite um nome para seu EFS e no final da página clique em "Próxim
 
 
 
+\## Load Balancer
+
+
+
+Para que o nosso Wordpress funcione corretamente e as instâncias não fiquem sobrecarregadas, criar um Load Balancer é essencial para dividir a carga entre as instâncias. Para cria-lo, no painel da EC2 selecione "Load balancers" e então clique em "Criar load balancer". Existem alguns tipos de Load Balancer, mas para este projeto iremos usar o Application Load Balancer, clique em "Criar"
+
+
+
+\[IMAGEM 20]
+
+
+
+Nas configurações básicas digite o nome do seu Load Balancer e vá para a seção de mapeamento do rede, nessa parte temos que selecionar a VPC criada, as zonas de disponibilidade, e as sub-redes públicas de cada zona
+
+
+
+\[IMAGEM 21]
+
+
+
+Na seção de grupos de segurança, selecione o grupo do Load Balancer criado anteriormente
+
+
+
+\[IMAGEM 22]
+
+
+
+Desça para a seleção de grupo de destino, que é para onde nosso Load Balancer irá redirecionar as requisições. Caso você não tenha um grupo de destino, basta clicar em "crie um grupo de destino". Por enquanto nós não temos nenhuma instância para associar ao grupo de destino, mas isso será feito pelo Auto Scaling.
+
+
+
+\[IMAGEM 23]
+
+
+
+Após a seleção desça ao fim da página e crie o load balancer.
+
+
+
+\## Auto Scaling
+
+
+
+Com o nosso banco de dados RDS e nosso sistema de arquivos EFS prontos, podemos começar a criar o Auto Scaling que irá construir as instâncias necessárias automaticamente de acordo com a quantidade mínima configurada, e irá ajustar o número de instâncias conforme o número de acessos ao nosso Wordpress.
+
+
+
 
 
 
@@ -204,5 +252,5 @@ Se preferir digite um nome para seu EFS e no final da página clique em "Próxim
 
 
 
-
+\## User-data
 
