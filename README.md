@@ -34,7 +34,7 @@ Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para 
 
 
 
-![criar-vpc](/imagens/criar-vpc "Criar VPC")
+![criar-vpc](/imagens/criar-vpc.png "Criar VPC")
 
 
 
@@ -42,7 +42,7 @@ Agora com VPC criada somos capazes de criar nossas sub-redes, no painel da VPC s
 
 
 
-\[IMAGEM - 2]
+![sub-redes](/imagens/sub-redes.png "Sub-Redes")
 
 
 
@@ -50,7 +50,7 @@ Repare que após a criação das sub-redes ainda não temos como saber qual de f
 
 
 
-\[IMAGEM - 3]
+![gateway-internet](/imagens/gateway-internet.png "Gateway de Internet")
 
 
 
@@ -58,7 +58,8 @@ Agora que temos um Gateway para Internet podemos criar as rotas necessárias par
 
 
 
-\[IMAGEM - 4]
+
+![tabelas-de-rotas](/imagens/tabelas-de-rotas.png "Tabelas de rotas")
 
 
 
@@ -66,15 +67,14 @@ Selecione "Adicionar rota" e escolha a opção de Gateway de internet, selecione
 
 
 
-\[IMAGEM - 5]
+![editar-rotas-gateway-internet](/imagens/editar-rotas-gateway-internet.png "Editar rota pública")
 
 
 
 Volte ao menu de sub-redes, e selecione cada rede e verifique se as duas sub-redes públicas estão associadas a tabela de rotas com saída para internet que acabamos de criar. Se necessário edite a associação da tabela de rotas.
 
 
-
-\[IMAGEM 6]
+![sub-rede-rota-internet](/imagens/sub-rede-rota-internet.png "Sub-rede com rota para internet")
 
 
 
