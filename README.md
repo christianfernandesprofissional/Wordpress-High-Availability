@@ -23,8 +23,10 @@ Antes de iniciar a implantação da aplicação, é necessário:
 * Conhecimento básico em **Linux**, **Docker/Docker Compose** e **bancos de dados relacionais (MySQL)** para um bom entendimento do processo mostrado neste documento
 
 
+***
+# Início
 
-Primeiros passos: (Estrutura de rede)
+## Estrutura de rede
 
 
 
@@ -32,7 +34,7 @@ Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para 
 
 
 
-\[IMAGEM - 1]
+![criar-vpc](/imagens/criar-vpc "Criar VPC")
 
 
 
