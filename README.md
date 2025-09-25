@@ -104,7 +104,7 @@ Antes de prosseguir com os outros recursos vamos deixar os Security Groups neces
 
 
 
-\[IMAGEM 9]
+![Security-groups](/imagens/security-groups.png "Security Groups")
 
 
 
@@ -112,7 +112,7 @@ Após a criação vamos configurar cada um dos Security Groups ajustando as regr
 
 
 
-\[IMAGEM 10]
+![regras-de-entrada-bastion](/imagens/regras-de-entrada-bastion.png "Regras de entrada Bastion Host")
 
 
 
@@ -120,7 +120,7 @@ Para o Security Group das instâncias do Wordpress configure as regras de entrad
 
 
 
-\[IMAGEM 11]
+![regras-de-entrada-wordpress](/imagens/regras-de-entrada-wordpress.png "Regras de entrada Wordpress EC2")
 
 
 
@@ -128,7 +128,7 @@ Para o Security Group do RDS devemos permitir a entrada do tipo MySQL/Aurora par
 
 
 
-\[IMAGEM 12]
+![regras-de-entrada-database](/imagens/regras-de-entrada-database.png "Regras de entrada RDS")
 
 
 
@@ -136,7 +136,7 @@ E por último para o Load Balancer devemos permitir qualquer requisição HTTP d
 
 
 
-\[IMAGEM 13]
+![regras-de-entrada-load-balancer](/imagens/regras-de-entrada-load-balancer.png "Regras de entrada Load Balancer")
 
 
 
