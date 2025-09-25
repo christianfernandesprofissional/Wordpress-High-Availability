@@ -39,17 +39,13 @@ Antes de iniciar a implantação da aplicação, é necessário:
 Para iniciarmos nossa implementação, primeiro devemos criar a nossa VPC, para isso na tela inicial da sua conta AWS e entre no menu da VPC escrevendo VPC na barra de pesquisa. Então selecione criar VPC, coloque um nome de sua preferência, preencha sua CIDR e Tags caso queira. A VPC utilizada neste projeto se chama vpcPrincipal. 
 
 
-
 ![criar-vpc](/imagens/criar-vpc.png "Criar VPC")
-
 
 
 Agora com VPC criada somos capazes de criar nossas sub-redes, no painel da VPC selecione "Sub-redes" e depois "Criar sub-rede", serão 4 sub-redes, 2 públicas e 2 privadas. Iremos trabalhar com zonas de disponibilidades diferentes então será uma pública e uma privada para zona us-east-1a e uma pública e uma privada para a zona us-east-1b, mas altere de acordo com sua necessidade.
 
 
-
 ![sub-redes](/imagens/sub-redes.png "Sub-Redes")
-
 
 
 Repare que após a criação das sub-redes ainda não temos como saber qual de fato é uma sub-rede pública, pois nenhuma tem acesso a internet ainda. Para isso devemos criar um Gateway de internet, para isso no painel da VPC acesse "Gateways da Internet", crie seu gateway e associe a sua VPC.
