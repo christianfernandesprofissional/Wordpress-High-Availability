@@ -146,6 +146,13 @@ E por último para o Load Balancer devemos permitir qualquer requisição HTTP d
 ![regras-de-entrada-load-balancer](/imagens/regras-de-entrada-load-balancer.png "Regras de entrada Load Balancer")
 
 
+## Bastion Host
+
+O Bastion Host é uma instância EC2 pública, que serve para acesso as instâncias privadas, para cria-la vá em EC2 e crie uma nova instância com a imagem desejada e o tipo desejado, crie uma chave SSH para acesso, selecione o Security Group que fizemos para  o Bastion Host e anexe uma sub-rede pública para acesso a internet. Não se esqueça de habilitar a geração de um IP público automático.
+
+
+![bastion-host](/imagens/bastion-host.png "Bastion Host")
+
 
 ## RDS
 
@@ -318,18 +325,37 @@ Agora temos nosso modelo de execução pronto para ser usado pelo Auto Scaling.
 ## Auto Scaling
 
 
+Com tudo pronto, podemos começar a criar o Auto Scaling que irá construir as instâncias necessárias automaticamente de acordo com a quantidade mínima configurada, e irá ajustar o número de instâncias conforme o número de acessos ao nosso Wordpress. No painel EC2 vá em Grupos Auto Scaling e clique em Criar grupo de Auto Scaling, coloque o nome do grupo, selecione o modelo de execução que criamos anteriormente e vá para próxima etapa
 
-Com o nosso banco de dados RDS e nosso sistema de arquivos EFS prontos, podemos começar a criar o Auto Scaling que irá construir as instâncias necessárias automaticamente de acordo com a quantidade mínima configurada, e irá ajustar o número de instâncias conforme o número de acessos ao nosso Wordpress.
-
-
-
+![auto-scaling-1](/imagens/auto-scaling-1.png "Criação do Grupo Auto Scaling")
 
 
+Nas configurações de rede, selecione a VPC e as duas subredes privadas, logo em seguida vá para próxima etapa
 
 
-\[IMAGEM 20]
+![auto-scaling-2](/imagens/auto-scaling-2.png "Criação do Grupo Auto Scaling")
+
+Nesta etapa selecione o Load Balancer que criamos anteriormente e o Grupo de destino
+
+
+![auto-scaling-3](/imagens/auto-scaling-3.png "Criação do Grupo Auto Scaling")
+
+Na próxima etapa iremos configurar o mínimo de instâncias que gostariamos, e quantidade máxima que pode ser criada pelo auto-scaling, de acordo com sua preferência também é possível configurar os critérios para criação de uma nova instância, após esta configuração logo abaixo habilite as métricas do CloudWatch para ver estatísticas das instâncias
+
+
+![auto-scaling-4](/imagens/auto-scaling-4.png "Criação do Grupo Auto Scaling")
 
 
 
-## User-data
+![auto-scaling-5](/imagens/auto-scaling-5.png "Criação do Grupo Auto Scaling")
+
+
+Por fim avance até o final, e crie seu grupo de Auto Scaling. Após estas etapas basta esperar o seu Auto Scaling iniciar as instâncias e acessa-las pelo endpoint do seu Load Balancer.
+
+## Resultado Final
+
+
+
+
+
 
