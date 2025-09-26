@@ -151,35 +151,17 @@ E por último para o Load Balancer devemos permitir qualquer requisição HTTP d
 
 
 
-Vamos iniciar a criação do RDS, para isso pesquise RDS na barra de pesquisa e selecione "Aurora e RDS", selecione "Criar um banco de dados". Para este projeto selecione o banco de dados MySQL.
+Vamos iniciar a criação do RDS, para isso pesquise RDS na barra de pesquisa e selecione "Aurora e RDS", selecione "Criar um banco de dados". Para este projeto selecione o banco de dados MySQL. Escolha o modelo para seu caso de uso, para este projeto seguiremos com o nível gratuito, com uma imagem t3.micro. Configure o nome do seu banco de dados, o usuário e a senha.
 
 
-
-\[IMAGEM 14]
-
-
-
-Escolha o modelo para seu caso de uso, para o projeto seguiremos com o nível gratuito.
-
-
-
-\[IMAGEM 15]
-
-
-
-Em Configurações preencha o nome do seu banco de dados, o usuário e a senha
-
-
-
-\[IMAGEM 16]
-
+![criacao-rds](/imagens/criacao-rds.png "Criação do RDS")
 
 
 Em Conectividade selecione a VPC criada anteriormente e também o Security Group do banco de dados. Desça até o final da página e clique em "Criar banco de dados".
 
 
 
-\[IMAGEM 17]
+![criacao-rds-conectividade](/imagens/criacao-rds-conectividade.png "Criação do RDS")
 
 
 
