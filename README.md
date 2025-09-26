@@ -100,7 +100,7 @@ Agora a estrutura de rede está completa e pronta para ser utilizada pelas nossa
 
 
 
-Antes de prosseguir com os outros recursos vamos deixar os Security Groups necessários prontos para serem usados, para isso vá até o painel da EC2 e selecione "Security groups". Devemos criar 4 Security Groups, um para o RDS, outro para as instâncias EC2 do Wordpress, um para o Bastion Host, e um para o Load Balancer.
+Antes de prosseguir com os outros recursos vamos deixar os Security Groups necessários prontos para serem usados, para isso vá até o painel da EC2 e selecione "Security groups". Devemos criar 5 Security Groups, um para o RDS, outro para as instâncias EC2 do Wordpress, um para o Bastion Host, um para o Load Balancer, e um para o EFS.
 
 
 
@@ -129,6 +129,13 @@ Para o Security Group do RDS devemos permitir a entrada do tipo MySQL/Aurora par
 
 
 ![regras-de-entrada-database](/imagens/regras-de-entrada-database.png "Regras de entrada RDS")
+
+
+Para o Security Group do EFS devemos permitir a entrada do tipo NFS para o Security Group das instâncias do Wordpress.
+
+
+
+![regras-de-entrada-efs](/imagens/regras-de-entrada-efs.png "Regras de entrada EFS")
 
 
 
