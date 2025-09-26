@@ -187,7 +187,7 @@ Nas configurações básicas digite o nome do seu Load Balancer e vá para a se�
 
 Na seção de grupos de segurança, selecione o grupo do Load Balancer criado anteriormente
 
-![criacao-efs-load-balancer](/imagens/criacao-efs-load-balancer.png "Criação do Load Balancer")
+![criacao-load-balancer](/imagens/criacao-load-balancer.png "Criação do Load Balancer")
 
 
 
