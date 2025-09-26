@@ -187,6 +187,7 @@ Nas configurações básicas digite o nome do seu Load Balancer e vá para a se�
 
 Na seção de grupos de segurança, selecione o grupo do Load Balancer criado anteriormente
 
+
 ![criacao-load-balancer](/imagens/criacao-load-balancer.png "Criação do Load Balancer")
 
 
@@ -198,12 +199,121 @@ Após a seleção desça ao fim da página e crie o load balancer.
 
 ## User-data
 
-Vamos construir nosso user-data para que as instâncias criadas sempre iniciem da maneira correta. Para isso vamos seguir 3 etapas, primeiro vamos ao nosso EFS, selecione seu EFS, clique em "Anexar"  e copie o código 
+Vamos construir nosso user-data para que as instâncias criadas sempre iniciem da maneira correta. Para isso vamos seguir 3 etapas, primeiro vamos ao nosso EFS, selecione seu EFS, clique em "Anexar"  copie o comando de montagem do EFS somente até a parte destacada e salve provisóriamente
 
+![comando-montagem-efs](/imagens/comando-montagem-efs.png "Comando de montagem do EFS")
+
+
+Depois vá no seu RDS e copie a endpoint do seu RDS
+
+
+![endpoint-RDS](/imagens/endpoint-RDS.png "Endpoint RDS")
+
+
+
+Agorá vá ao seu Load Balancer e copie também, o endpoint fornecido pelo Load Balancer
+
+
+![endpoint-Load-Balancer](/imagens/endpoint-Load-Balancer.png "Endpoint Load Balancer")
+
+
+Com o comando de montagem e os endpoints em mãos podemos criar nosso user-data, copie o código abaixo e substitua os textos copiados nos lugares indicados:
+
+
+    #!/bin/bash
+
+    # Instala Docker
+    sudo yum update -y
+    # Install Docker
+    sudo yum install docker -y
+    sudo service docker start
+    sudo systemctl enable docker
+    sudo usermod -a -G docker ec2-user
+    sudo chmod 666 /var/run/docker.sock
+    
+    # Instala Docker Compose
+    sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    
+    mkdir /my-compose
+
+    # Instala MySQL
+    sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
+    sudo dnf install -y https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
+    sudo dnf install -y mysql-community-server
+    
+    RDS_HOST="[SEU ENDPOINT RDS AQUI]"
+    RDS_ADMIN_USER="wordpress"
+    RDS_ADMIN_PASSWORD="[SUA SENHA DO RDS]"
+    WP_DB_NAME="wordpress"
+    
+    mysql -h $RDS_HOST -u $RDS_ADMIN_USER -p$RDS_ADMIN_PASSWORD <<EOF
+    CREATE DATABASE IF NOT EXISTS $WP_DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    EOF
+    
+    sudo mkdir -p /efs/wp-content
+    sudo chmod -R 777 /efs
+    
+    
+    until [SEU COMANDO DE MONTAGEM DO EFS AQUI] /efs/wp-content/; do
+        echo "Aguardando EFS ficar disponível..."
+        sleep 10
+    done
+    
+    sudo chown -R 33:33 /efs/wp-content
+
+    # Cria o docker-compose
+    echo "version: '3.3'" >> /my-compose/docker-compose.yml
+    echo >> /my-compose/docker-compose.yml
+    echo "services: " >> /my-compose/docker-compose.yml
+    echo "  wordpress:" >> /my-compose/docker-compose.yml
+    echo "    image: wordpress:latest" >> /my-compose/docker-compose.yml
+    echo "    restart: always" >> /my-compose/docker-compose.yml
+    echo "    ports:" >> /my-compose/docker-compose.yml
+    echo "      - \"80:80\"" >> /my-compose/docker-compose.yml
+    echo "    environment:" >> /my-compose/docker-compose.yml
+    echo "      WORDPRESS_DB_HOST: [SEU ENDPOINT RDS AQUI]:3306" >> /my-compose/docker-compose.yml
+    echo "      WORDPRESS_DB_USER: wordpress" >> /my-compose/docker-compose.yml
+    echo "      WORDPRESS_DB_PASSWORD: [SUA SENHA DO RDS]" >> /my-compose/docker-compose.yml
+    echo "      WORDPRESS_DB_NAME: wordpress" >> /my-compose/docker-compose.yml
+    echo "    volumes:" >> /my-compose/docker-compose.yml
+    echo "      - /efs/wp-content:/var/www/html/wp-content" >> /my-compose/docker-compose.yml
+    echo >> /my-compose/docker-compose.yml
+    
+    cd /my-compose
+    docker-compose up -d
+    
+    # Variável do DNS do Load Balancer
+    LB_DNS="[SEU ENDPOINT DO LOAD BALANCER AQUI]"
+    
+    # Atualiza URLs do WordPress para usar o Load Balancer
+    mysql -h $RDS_HOST -u $RDS_ADMIN_USER -p$RDS_ADMIN_PASSWORD $WP_DB_NAME <<EOF
+    UPDATE wp_options 
+      SET option_value='http://$LB_DNS' 
+      WHERE option_name IN ('siteurl','home');
+    EOF
+
+
+Com o user-data pronto podemos ir para a próxima etapa.
 
 ## Modelo de execução
 
-Agora está ná hora de preparar o modelo para que o Auto scaling crie nossas instâncias, para isso no painel do EC2 selecione "Modelos de execução" e clique em criar modelo de execução.
+Agora está ná hora de preparar o modelo para que o Auto scaling crie nossas instâncias, para isso no painel do EC2 selecione "Modelos de execução" e clique em criar modelo de execução. Iremos usar a imagem do Linux da AWS em uma t2.micro
+
+![modelo-de-execucao-1](/imagens/modelo-de-execucao-1.png "Imagem modelo de execução")
+
+
+Não iremos deixar nenhuma configuração de rede associada, vamos somente associar ao grupo de segurança das instâncias do wordpress
+
+![modelo-de-execucao-2](/imagens/modelo-de-execucao-2.png "Rede e SG modelo de execução")
+
+Desça até detalhes avançados, e no final em "Dados do usuário" cole o user-data que deixamos pronto
+
+![modelo-de-execucao-3](/imagens/modelo-de-execucao-3.png "User-data modelo de execução")
+
+
+Agora temos nosso modelo de execução pronto para ser usado pelo Auto Scaling.
+
 
 ## Auto Scaling
 
