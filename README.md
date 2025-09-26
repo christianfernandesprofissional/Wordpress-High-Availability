@@ -25,6 +25,15 @@ Antes de iniciar a implantação da aplicação, é necessário:
 ## Sumário
 
 - [Estrutura de rede;](#Estrutura-de-rede)
+- [Security Groups;](#security-groups)
+- [Bastion Host;](#bastion-host)
+- [RDS;](#rds)
+- [EFS;](#efs)
+- [Load Balancer;](#load-balancer)
+- [Criação do user-data;](#user-data)
+- [Modelo de execução;](#modelo-execucao)
+- [Grupo de Auto Scaling;](#auto-scaling)
+- [Resultado final;](#resultado-final)
 
 
 ***
@@ -96,6 +105,8 @@ Agora a estrutura de rede está completa e pronta para ser utilizada pelas nossa
 
 </div>
 
+<div id="security-groups">
+
 ## Security Groups
 
 
@@ -145,6 +156,9 @@ E por último para o Load Balancer devemos permitir qualquer requisição HTTP d
 
 ![regras-de-entrada-load-balancer](/imagens/regras-de-entrada-load-balancer.png "Regras de entrada Load Balancer")
 
+</div>
+
+<div id="bastion-host">
 
 ## Bastion Host
 
@@ -153,6 +167,9 @@ O Bastion Host é uma instância EC2 pública, que serve para acesso as instânc
 
 ![bastion-host](/imagens/bastion-host.png "Bastion Host")
 
+</div>
+
+<div id="rds">
 
 ## RDS
 
@@ -170,7 +187,9 @@ Em Conectividade selecione a VPC criada anteriormente e também o Security Group
 
 ![criacao-rds-conectividade](/imagens/criacao-rds-conectividade.png "Criação do RDS")
 
+</div>
 
+<div id="efs">
 
 ## EFS
 
@@ -180,6 +199,10 @@ Para criar o EFS digite EFS na barra de pesquisa e clique em "Criar sistema de a
 
 
 ![criacao-efs-conectividade](/imagens/criacao-efs-conectividade.png "Criação do EFS")
+
+</div>
+
+<div id="load-balancer">
 
 
 
@@ -203,6 +226,11 @@ Desça para a seleção de grupo de destino, que é para onde nosso Load Balance
 
 
 Após a seleção desça ao fim da página e crie o load balancer.
+
+</div>
+
+<div id="user-data">
+
 
 ## User-data
 
@@ -303,6 +331,10 @@ Com o comando de montagem e os endpoints em mãos podemos criar nosso user-data,
 
 Com o user-data pronto podemos ir para a próxima etapa.
 
+</div>
+
+<div id="modelo-execucao">
+
 ## Modelo de execução
 
 Agora está ná hora de preparar o modelo para que o Auto scaling crie nossas instâncias, para isso no painel do EC2 selecione "Modelos de execução" e clique em criar modelo de execução. Iremos usar a imagem do Linux da AWS em uma t2.micro
@@ -321,6 +353,9 @@ Desça até detalhes avançados, e no final em "Dados do usuário" cole o user-d
 
 Agora temos nosso modelo de execução pronto para ser usado pelo Auto Scaling.
 
+</div>
+
+<div id="auto-scaling">
 
 ## Auto Scaling
 
@@ -352,7 +387,13 @@ Na próxima etapa iremos configurar o mínimo de instâncias que gostariamos, e 
 
 Por fim avance até o final, e crie seu grupo de Auto Scaling. Após estas etapas basta esperar o seu Auto Scaling iniciar as instâncias e acessa-las pelo endpoint do seu Load Balancer.
 
+</div>
+
+<div id="resultado-final">
+
 ## Resultado Final
+
+</div>
 
 
 
