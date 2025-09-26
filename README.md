@@ -169,63 +169,43 @@ Em Conectividade selecione a VPC criada anteriormente e também o Security Group
 
 
 
-Para criar o EFS digite EFS na barra de pesquisa e clique em "Criar sistema de arquivos" e depois em "Personalizar"
+Para criar o EFS digite EFS na barra de pesquisa e clique em "Criar sistema de arquivos" e depois em "Personalizar". Se preferir digite um nome para seu EFS e no final da página clique em "Próximo", na configuração de rede, selecione as duas zonas de disponibilidade que vamos trabalhar, as sub-redes privadas e o grupo de segurança do EFS, clique em "Próximo" até o final e crie o seu EFS
+
+
+![criacao-efs-conectividade](/imagens/criacao-efs-conectividade.png "Criação do EFS")
 
 
 
-\[IMAGEM 18]
+## Load Balancer
 
 
-
-Se preferir digite um nome para seu EFS e no final da página clique em "Próximo", na configuração de rede, selecione as sub-redes privadas e o grupo de segurança das instâncias do Wordpress, clique em "Próximo" até o final e crie o seu EFS
-
-
-
-\[IMAGEM 19]
-
-
-
-\# Load Balancer
-
-
-
-Para que o nosso Wordpress funcione corretamente e as instâncias não fiquem sobrecarregadas, criar um Load Balancer é essencial para dividir a carga entre as instâncias. Para cria-lo, no painel da EC2 selecione "Load balancers" e então clique em "Criar load balancer". Existem alguns tipos de Load Balancer, mas para este projeto iremos usar o Application Load Balancer, clique em "Criar"
-
-
-
-\[IMAGEM 20]
-
+Para que o nosso Wordpress funcione corretamente e as instâncias não fiquem sobrecarregadas, criar um Load Balancer é essencial para dividir a carga entre as instâncias. Para cria-lo, no painel da EC2 selecione "Load balancers" e então clique em "Criar load balancer". Existem alguns tipos de Load Balancer, mas para este projeto iremos usar o Application Load Balancer, clique em "Criar" e siga para próxima etapa.
 
 
 Nas configurações básicas digite o nome do seu Load Balancer e vá para a seção de mapeamento do rede, nessa parte temos que selecionar a VPC criada, as zonas de disponibilidade, e as sub-redes públicas de cada zona
 
 
-
-\[IMAGEM 21]
-
-
-
 Na seção de grupos de segurança, selecione o grupo do Load Balancer criado anteriormente
 
-
-
-\[IMAGEM 22]
+![criacao-efs-load-balancer](/imagens/criacao-efs-load-balancer.png "Criação do Load Balancer")
 
 
 
 Desça para a seleção de grupo de destino, que é para onde nosso Load Balancer irá redirecionar as requisições. Caso você não tenha um grupo de destino, basta clicar em "crie um grupo de destino". Por enquanto nós não temos nenhuma instância para associar ao grupo de destino, mas isso será feito pelo Auto Scaling.
 
 
-
-\[IMAGEM 23]
-
-
-
 Após a seleção desça ao fim da página e crie o load balancer.
 
+## User-data
+
+Vamos construir nosso user-data para que as instâncias criadas sempre iniciem da maneira correta. Para isso vamos seguir 3 etapas, primeiro vamos ao nosso EFS, selecione seu EFS, clique em "Anexar"  e copie o código 
 
 
-\## Auto Scaling
+## Modelo de execução
+
+Agora está ná hora de preparar o modelo para que o Auto scaling crie nossas instâncias, para isso no painel do EC2 selecione "Modelos de execução" e clique em criar modelo de execução.
+
+## Auto Scaling
 
 
 
