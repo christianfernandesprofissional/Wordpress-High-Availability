@@ -279,7 +279,7 @@ Com o comando de montagem e os endpoints em mãos podemos criar nosso user-data,
     
     mkdir /my-compose
 
-    # Instala MySQL
+    # Instala MySQL e cria banco de dados se não existir
     sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
     sudo dnf install -y https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
     sudo dnf install -y mysql-community-server
