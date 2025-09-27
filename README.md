@@ -1,8 +1,15 @@
 # Aplicação WordPress de Alta Disponibilidade na AWS
 
+<img align="center" alt="Linux" width="80px" height="80px" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"/>  <img align="center" alt="NGINX" width="80px" height="80px" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/wordpress/wordpress-original.svg"/><img align="center" alt="NGINX" width="80px" height="80px" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-plain-wordmark.svg"/> <img align="center" alt="NGINX" width="80px" height="80px" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original-wordmark.svg"/>
+
+
 ## Sobre o projeto
 
 Este projeto apresenta uma aplicação **WordPress** com **alta disponibilidade** implementada na **AWS**, seguindo uma arquitetura escalável e segura. A aplicação é executada em **containers Docker** usando **Docker Compose**, hospedados em **instâncias EC2 distribuídas em múltiplas zonas de disponibilidade (AZs)** para garantir redundância e continuidade de serviço. O tráfego é distribuído por um **Elastic Load Balancer (ELB)**, enquanto o **Auto Scaling** garante ajuste automático da quantidade de instâncias conforme a demanda. O armazenamento de arquivos compartilhados é feito pelo **Amazon EFS**, e o banco de dados relacional é gerenciado pelo **Amazon RDS**.
+
+## Estrutura
+
+![diagrama](/imagens/diagrama.png "Estrutura")
 
 ## Tecnologias utilizadas
 
