@@ -397,13 +397,15 @@ Após todas estas etapas, apenas aguarde alguns minutos para que as instâncias 
 
 ![instancias](/imagens/instancias.png "Instâncias do Auto Scaling")
 
-Após o início das instâncias, coloque o link DNS gerado pelo Auto Scaling no seu navegador, e  configure seu Wordpress. 
+Após o início das instâncias, coloque o link DNS gerado pelo Auto Scaling no seu navegador, e crie seu login, acesse a página inicial e configure seu Wordpress. 
+
+![primeira-tela-wordpress](/imagens/primeira-tela-wordpress.png "Configuração do Wordpress")
 
 Depois de configurado você já pode acessar sua página Wordpress
 
 ![site-wordpress](/imagens/site-wordpress.png "Site Wordpress")
 
-Para verificar o status das suas instâncias basta acessar o seu Grupo Auto Scaling, e olhar se os health checks estão Ok. 
+Para verificar o status das suas instâncias após configurar seu Wordpress, basta esperar alguns minutos e acessar o seu Grupo Auto Scaling, e olhar se as verificações estão Ok.
 
 ![load-balancer-status](/imagens/load-balancer-status.png "Status Load Balancer")
 
