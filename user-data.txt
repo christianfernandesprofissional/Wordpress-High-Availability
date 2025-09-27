@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Instala Docker
 sudo yum update -y
 # Install Docker
 sudo yum install docker -y
@@ -14,27 +15,32 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 mkdir /my-compose
 
-# Adiciona o repositório do MySQL na máquina e instala o MySQL
+# Instala MySQL e cria banco de dados se não existir
 sudo wget https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
 sudo dnf install -y https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm
 sudo dnf install -y mysql-community-server
 
-# Configura algumas variáveis
-RDS_HOST="Link-do-seu-RDS"
-RDS_ADMIN_USER="seu usuário"
-RDS_ADMIN_PASSWORD="sua senha"
+RDS_HOST="[SEU ENDPOINT RDS AQUI]"
+RDS_ADMIN_USER="wordpress"
+RDS_ADMIN_PASSWORD="[SUA SENHA DO RDS]"
 WP_DB_NAME="wordpress"
-WP_USER="wordpress"
-WP_PASSWORD="sua senha"
 
-# Entra no banco de dados RDS e cria a tabela wordpress se necessário
 mysql -h $RDS_HOST -u $RDS_ADMIN_USER -p$RDS_ADMIN_PASSWORD <<EOF
 CREATE DATABASE IF NOT EXISTS $WP_DB_NAME CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '$WP_USER'@'%' IDENTIFIED BY '$WP_PASSWORD';
-GRANT ALL PRIVILEGES ON $WP_DB_NAME.* TO '$WP_USER'@'%';
-FLUSH PRIVILEGES;
 EOF
 
+sudo mkdir -p /efs/wp-content
+sudo chmod -R 777 /efs
+
+
+until [SEU COMANDO DE MONTAGEM DO EFS AQUI] /efs/wp-content/; do
+    echo "Aguardando EFS ficar disponível..."
+    sleep 10
+done
+
+sudo chown -R 33:33 /efs/wp-content
+
+# Cria o docker-compose
 echo "version: '3.3'" >> /my-compose/docker-compose.yml
 echo >> /my-compose/docker-compose.yml
 echo "services: " >> /my-compose/docker-compose.yml
@@ -44,15 +50,23 @@ echo "    restart: always" >> /my-compose/docker-compose.yml
 echo "    ports:" >> /my-compose/docker-compose.yml
 echo "      - \"80:80\"" >> /my-compose/docker-compose.yml
 echo "    environment:" >> /my-compose/docker-compose.yml
-echo "      WORDPRESS_DB_HOST: link-RDS:3306" >> /my-compose/docker-compose.yml
-echo "      WORDPRESS_DB_USER: seu usuario" >> /my-compose/docker-compose.yml
-echo "      WORDPRESS_DB_PASSWORD: sua senha" >> /my-compose/docker-compose.yml
-echo "      WORDPRESS_DB_NAME: nome do seu banco de dados" >> /my-compose/docker-compose.yml
+echo "      WORDPRESS_DB_HOST: [SEU ENDPOINT RDS AQUI]:3306" >> /my-compose/docker-compose.yml
+echo "      WORDPRESS_DB_USER: wordpress" >> /my-compose/docker-compose.yml
+echo "      WORDPRESS_DB_PASSWORD: [SUA SENHA DO RDS]" >> /my-compose/docker-compose.yml
+echo "      WORDPRESS_DB_NAME: wordpress" >> /my-compose/docker-compose.yml
 echo "    volumes:" >> /my-compose/docker-compose.yml
-echo "      - wordpress:/var/www/html" >> /my-compose/docker-compose.yml
+echo "      - /efs/wp-content:/var/www/html/wp-content" >> /my-compose/docker-compose.yml
 echo >> /my-compose/docker-compose.yml
-echo "volumes:" >> /my-compose/docker-compose.yml
-echo "  wordpress:" >> /my-compose/docker-compose.yml
 
 cd /my-compose
 docker-compose up -d
+
+# Variável do DNS do Load Balancer
+LB_DNS="[SEU ENDPOINT DO LOAD BALANCER AQUI]"
+
+# Atualiza URLs do WordPress para usar o Load Balancer
+mysql -h $RDS_HOST -u $RDS_ADMIN_USER -p$RDS_ADMIN_PASSWORD $WP_DB_NAME <<EOF
+UPDATE wp_options 
+  SET option_value='http://$LB_DNS' 
+  WHERE option_name IN ('siteurl','home');
+EOF
